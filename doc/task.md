@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 CURRENT FOCUS: Phase 1 - Proof of Concept
+## 🎯 CURRENT FOCUS: Phase 2 - Web Player
 
 ---
 
@@ -71,9 +71,9 @@
 ### 1.7 Phase 1 Testing & Validation
 - [x] Test parallax effect on different monitors
 - [x] Verify smooth 60 FPS rendering
-- [ ] Document performance metrics
+- [x] Document performance metrics
 - [x] Create demo recording
-- [ ] User acceptance testing
+- [x] User acceptance testing
 
 ---
 
@@ -81,7 +81,7 @@
 **Objective:** Replace static images with video loops and enable browser accessibility.
 
 ### 2.1 Video Asset Integration
-- [ ] Research WebM/HEVC with alpha channel support
+- [/] Research WebM/HEVC with alpha channel support
 - [ ] Create video loading pipeline
 - [ ] Implement video texture mapping to Three.js planes
 - [ ] Handle video loop synchronization
