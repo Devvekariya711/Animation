@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Parallax Video Platform with Head Tracking">
+    <title>PARALLAX-CORE</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <!-- Three.js Canvas Container -->
+    <div id="scene-container"></div>
+    
+    <!-- Hidden Webcam Video -->
+    <video id="webcam" autoplay playsinline style="display: none;"></video>
+    
+    <!-- Tracking Confidence Indicator -->
+    <div id="confidence-indicator">
+        <span id="confidence-value">--</span>%
+    </div>
+    
+    <!-- Light Booster Overlay (for low light conditions) -->
+    <div id="light-booster" class="hidden"></div>
+    
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="loader"></div>
+        <p>Loading Face Tracking...</p>
+    </div>
+    
+    <!-- Debug Panel (optional) -->
+    <div id="debug-panel" class="hidden">
+        <div>Head X: <span id="head-x">0</span></div>
+        <div>Head Y: <span id="head-y">0</span></div>
+        <div>FPS: <span id="fps">0</span></div>
+    </div>
+
+    <!-- MediaPipe Face Mesh CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    
+    <!-- Main Application -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html>
