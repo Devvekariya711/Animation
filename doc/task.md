@@ -25,54 +25,54 @@
 **Objective:** Validate math and tracking logic using static images locally.
 
 ### 1.1 Asset Preparation
-- [ ] Create placeholder layer images (or use test assets)
-  - [ ] `layer_bg.png` - Background layer (sky, mountains)
-  - [ ] `layer_mid.png` - Mid-ground layer (trees, buildings)
-  - [ ] `layer_char.png` - Foreground layer (characters)
-- [ ] Document asset specifications (resolution, transparency)
+- [x] Create placeholder layer images (or use test assets)
+  - [x] `layer_bg.png` - Background layer (sky, mountains)
+  - [x] `layer_mid.png` - Mid-ground layer (trees, buildings)
+  - [x] `layer_char.png` - Foreground layer (characters)
+- [x] Document asset specifications (resolution, transparency)
 
 ### 1.2 Three.js Scene Configuration
-- [ ] Setup basic Three.js scene with WebGL renderer
-- [ ] Configure virtual camera at `Z = 5`
-- [ ] Create plane geometries for each layer
-- [ ] Position layers in 3D space:
-  - [ ] Background at `Z = -10` (3x scale)
-  - [ ] Mid-ground at `Z = 0`
-  - [ ] Foreground at `Z = 2`
-- [ ] Implement texture loading for PNG layers
-- [ ] Verify scene renders correctly from front view
+- [x] Setup basic Three.js scene with WebGL renderer
+- [x] Configure virtual camera at `Z = 5`
+- [x] Create plane geometries for each layer
+- [x] Position layers in 3D space:
+  - [x] Background at `Z = -10` (3x scale)
+  - [x] Mid-ground at `Z = 0`
+  - [x] Foreground at `Z = 2`
+- [x] Implement texture loading for PNG layers
+- [x] Verify scene renders correctly from front view
 
 ### 1.3 MediaPipe Face Tracking Integration
-- [ ] Initialize webcam stream in browser
-- [ ] Load MediaPipe Face Mesh model
-- [ ] Extract nose tip coordinates (Landmark 1)
-- [ ] Normalize coordinates to -1.0 to +1.0 range
-- [ ] Display tracking confidence percentage
-- [ ] Handle webcam permission errors gracefully
+- [x] Initialize webcam stream in browser
+- [x] Load MediaPipe Face Mesh model
+- [x] Extract nose tip coordinates (Landmark 1)
+- [x] Normalize coordinates to -1.0 to +1.0 range
+- [x] Display tracking confidence percentage
+- [x] Handle webcam permission errors gracefully
 
 ### 1.4 Parallax Math Implementation
-- [ ] Map head X position to camera X (inverted)
-- [ ] Map head Y position to camera Y (inverted)
-- [ ] Implement sensitivity controls
-- [ ] Add Linear Interpolation (Lerp) smoothing
-- [ ] Optional: Implement One Euro Filter for jitter reduction
+- [x] Map head X position to camera X (inverted)
+- [x] Map head Y position to camera Y (inverted)
+- [x] Implement sensitivity controls
+- [x] Add Linear Interpolation (Lerp) smoothing
+- [x] Optional: Implement One Euro Filter for jitter reduction
 
 ### 1.5 Off-Axis Projection
-- [ ] Research and implement off-axis projection matrix
-- [ ] Connect camera frustum to head position
-- [ ] Test "window into another world" effect
+- [x] Research and implement off-axis projection matrix
+- [x] Connect camera frustum to head position
+- [x] Test "window into another world" effect
 
 ### 1.6 Low Light Handling
-- [ ] Create "Light Booster" CSS overlay
-- [ ] Detect tracking confidence drop (<50%)
-- [ ] Trigger screen border flash when needed
-- [ ] Add manual toggle for light booster
+- [x] Create "Light Booster" CSS overlay
+- [x] Detect tracking confidence drop (<50%)
+- [x] Trigger screen border flash when needed
+- [x] Add manual toggle for light booster
 
 ### 1.7 Phase 1 Testing & Validation
-- [ ] Test parallax effect on different monitors
-- [ ] Verify smooth 60 FPS rendering
+- [x] Test parallax effect on different monitors
+- [x] Verify smooth 60 FPS rendering
 - [ ] Document performance metrics
-- [ ] Create demo recording
+- [x] Create demo recording
 - [ ] User acceptance testing
 
 ---
@@ -169,9 +169,9 @@
 
 | Checkpoint | Phase | Test Type | Status |
 |------------|-------|-----------|--------|
-| CP1.1 | Phase 1 | Scene renders correctly | [ ] |
-| CP1.2 | Phase 1 | Face tracking works | [ ] |
-| CP1.3 | Phase 1 | Parallax effect visible | [ ] |
+| CP1.1 | Phase 1 | Scene renders correctly | [x] |
+| CP1.2 | Phase 1 | Face tracking works | [x] |
+| CP1.3 | Phase 1 | Parallax effect visible | [x] |
 | CP2.1 | Phase 2 | Video layers sync | [ ] |
 | CP2.2 | Phase 2 | Web deployment works | [ ] |
 | CP3.1 | Phase 3 | API endpoints functional | [ ] |
@@ -185,9 +185,9 @@
 
 | Risk | Status | Mitigation Implemented |
 |------|--------|------------------------|
-| Low Light Conditions | 🟡 | [ ] Light Booster |
-| Webcam Latency | 🟡 | [ ] Client-side JS only |
-| Jittery Movement | 🟡 | [ ] Smoothing filters |
+| Low Light Conditions | 🟢 | [x] Light Booster |
+| Webcam Latency | 🟢 | [x] Client-side JS only |
+| Jittery Movement | 🟢 | [x] Smoothing filters |
 | Video Sync Issues | 🟡 | [ ] Pre-load buffer |
 
 ---
