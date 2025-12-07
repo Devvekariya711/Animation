@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,27 +8,44 @@
     <title>PARALLAX-CORE</title>
     <link rel="stylesheet" href="./css/styles.css">
 </head>
+
 <body>
     <!-- Three.js Canvas Container -->
     <div id="scene-container"></div>
-    
-    <!-- Hidden Webcam Video -->
-    <video id="webcam" autoplay playsinline style="display: none;"></video>
-    
+
+    <!-- Webcam Preview (visible) -->
+    <div id="webcam-container" class="hidden">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="face-canvas"></canvas>
+        <div id="webcam-label">Face Tracking</div>
+    </div>
+
     <!-- Tracking Confidence Indicator -->
     <div id="confidence-indicator">
         <span id="confidence-value">--</span>%
     </div>
-    
+
+    <!-- Mode Toggle Button -->
+    <button id="mode-toggle" class="control-btn">
+        <span id="mode-icon">🖱️</span>
+        <span id="mode-text">Demo Mode</span>
+    </button>
+
+    <!-- Parallax Movement Indicator -->
+    <div id="parallax-indicator">
+        <div id="parallax-dot"></div>
+        <div id="parallax-crosshair"></div>
+    </div>
+
     <!-- Light Booster Overlay (for low light conditions) -->
     <div id="light-booster" class="hidden"></div>
-    
+
     <!-- Loading Screen -->
     <div id="loading">
         <div class="loader"></div>
-        <p>Loading Face Tracking...</p>
+        <p>Loading...</p>
     </div>
-    
+
     <!-- Debug Panel (optional) -->
     <div id="debug-panel" class="hidden">
         <div>Head X: <span id="head-x">0</span></div>
@@ -38,8 +56,9 @@
     <!-- MediaPipe Face Mesh CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    
+
     <!-- Main Application -->
     <script type="module" src="./js/main.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,10 @@
+# PARALLAX-CORE Python Dependencies
+# Note: This is a JavaScript/Node.js project
+# Python is only needed for optional tooling
+
+# Testing
+pytest>=7.0.0
+
+# Development tools
+black>=23.0.0
+flake8>=6.0.0

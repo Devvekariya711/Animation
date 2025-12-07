@@ -40,6 +40,11 @@ const confidenceEl = document.getElementById('confidence-indicator');
 const confidenceValueEl = document.getElementById('confidence-value');
 const lightBoosterEl = document.getElementById('light-booster');
 const debugPanelEl = document.getElementById('debug-panel');
+const webcamContainerEl = document.getElementById('webcam-container');
+const modeToggleEl = document.getElementById('mode-toggle');
+const modeIconEl = document.getElementById('mode-icon');
+const modeTextEl = document.getElementById('mode-text');
+const parallaxDotEl = document.getElementById('parallax-dot');
 
 /**
  * Initialize the application
@@ -69,14 +74,14 @@ async function init() {
     // Initialize FPS counter
     fpsCounter = new FPSCounter();
 
+    // Setup mode toggle button
+    setupModeToggle();
+
     if (demoMode) {
         // DEMO MODE: Use mouse for control
         console.log('Starting in DEMO MODE (mouse control)');
         setupMouseControl();
-
-        // Update UI for demo mode
-        confidenceValueEl.textContent = 'DEMO';
-        confidenceEl.style.color = '#00aaff';
+        updateModeUI(true);
 
         // Hide loading and start
         loadingEl.classList.add('hidden');
@@ -90,7 +95,7 @@ async function init() {
         isRunning = true;
         animateDemo();
 
-        console.log('PARALLAX-CORE ready! (Demo Mode - Press T to enable tracking)');
+        console.log('PARALLAX-CORE ready! (Demo Mode - Click button to enable tracking)');
     } else {
         // TRACKING MODE: Use webcam
         await initTracking();
@@ -98,9 +103,80 @@ async function init() {
 }
 
 /**
+ * Setup mode toggle button
+ */
+function setupModeToggle() {
+    modeToggleEl.addEventListener('click', async () => {
+        if (demoMode) {
+            // Switch to tracking mode
+            demoMode = false;
+            isRunning = false;
+            modeToggleEl.disabled = true;
+            modeTextEl.textContent = 'Loading...';
+            await initTracking();
+            modeToggleEl.disabled = false;
+        } else {
+            // Switch back to demo mode
+            demoMode = true;
+            isRunning = false;
+
+            // Stop tracker
+            if (tracker) {
+                tracker.stop();
+                tracker = null;
+            }
+
+            // Hide webcam
+            webcamContainerEl.classList.add('hidden');
+
+            // Update UI
+            updateModeUI(true);
+
+            // Start demo mode
+            isRunning = true;
+            animateDemo();
+        }
+    });
+}
+
+/**
+ * Update UI for current mode
+ */
+function updateModeUI(isDemoMode) {
+    if (isDemoMode) {
+        modeIconEl.textContent = '🖱️';
+        modeTextEl.textContent = 'Demo Mode';
+        modeToggleEl.classList.remove('tracking');
+        confidenceValueEl.textContent = 'DEMO';
+        confidenceEl.style.color = '#00aaff';
+        webcamContainerEl.classList.add('hidden');
+    } else {
+        modeIconEl.textContent = '👤';
+        modeTextEl.textContent = 'Face Tracking';
+        modeToggleEl.classList.add('tracking');
+        confidenceEl.style.color = '';
+        webcamContainerEl.classList.remove('hidden');
+    }
+}
+
+/**
+ * Update parallax indicator dot position
+ */
+function updateParallaxIndicator(x, y) {
+    // Map -1 to 1 range to pixel offset (max 35px from center)
+    const offsetX = x * 35;
+    const offsetY = y * 35;
+    parallaxDotEl.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
+}
+
+/**
  * Initialize face tracking
  */
 async function initTracking() {
+    // Show loading
+    loadingEl.querySelector('p').textContent = 'Starting Face Tracking...';
+    loadingEl.classList.remove('hidden');
+
     // Initialize face tracker
     tracker = new FaceTracker();
 
@@ -114,8 +190,7 @@ async function initTracking() {
         console.warn('Webcam not available, switching to demo mode');
         demoMode = true;
         setupMouseControl();
-        confidenceValueEl.textContent = 'DEMO';
-        confidenceEl.style.color = '#00aaff';
+        updateModeUI(true);
         loadingEl.classList.add('hidden');
 
         if (CONFIG.debug) {
@@ -126,6 +201,9 @@ async function initTracking() {
         animateDemo();
         return;
     }
+
+    // Update UI for tracking mode
+    updateModeUI(false);
 
     // Show debug panel if enabled
     if (CONFIG.debug) {
@@ -139,7 +217,7 @@ async function initTracking() {
     isRunning = true;
     animate();
 
-    console.log('PARALLAX-CORE ready!');
+    console.log('PARALLAX-CORE ready! (Face Tracking Mode)');
 }
 
 /**
@@ -147,6 +225,7 @@ async function initTracking() {
  */
 function setupMouseControl() {
     document.addEventListener('mousemove', (e) => {
+        if (!demoMode) return;
         // Normalize mouse position to -1 to 1
         mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
         mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -157,12 +236,15 @@ function setupMouseControl() {
  * Animation loop for demo mode (mouse control)
  */
 function animateDemo() {
-    if (!isRunning) return;
+    if (!isRunning || !demoMode) return;
 
     requestAnimationFrame(animateDemo);
 
     // Update parallax with mouse position
     parallax.update(mouseX, mouseY);
+
+    // Update parallax indicator
+    updateParallaxIndicator(mouseX, mouseY);
 
     // Render scene
     scene.render();
@@ -182,7 +264,7 @@ function animateDemo() {
  * Animation loop for tracking mode
  */
 function animate() {
-    if (!isRunning) return;
+    if (!isRunning || demoMode) return;
 
     requestAnimationFrame(animate);
 
@@ -191,6 +273,9 @@ function animate() {
 
     // Update parallax
     parallax.update(pos.x, pos.y);
+
+    // Update parallax indicator
+    updateParallaxIndicator(pos.x, pos.y);
 
     // Render scene
     scene.render();
@@ -210,6 +295,8 @@ function animate() {
  * Handle confidence changes
  */
 function handleConfidenceChange(confidence) {
+    if (demoMode) return;
+
     confidenceValueEl.textContent = Math.round(confidence);
 
     // Update indicator color
@@ -262,19 +349,15 @@ document.addEventListener('keydown', (e) => {
             if (tracker) tracker.reset();
             mouseX = 0;
             mouseY = 0;
+            updateParallaxIndicator(0, 0);
             break;
         case 't':
         case 'T':
-            // Toggle tracking mode (disable demo mode and init tracking)
-            if (demoMode && !tracker) {
-                demoMode = false;
-                isRunning = false;
-                initTracking();
-            }
+            // Trigger mode toggle button click
+            modeToggleEl.click();
             break;
     }
 });
 
 // Start the application
 init();
-
