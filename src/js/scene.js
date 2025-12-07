@@ -7,9 +7,9 @@ import * as THREE from 'three';
 
 // Layer Z positions (from project spec)
 const LAYER_CONFIG = {
-    background: { z: -10, scale: 3.0 },
-    midground: { z: 0, scale: 1.5 },
-    foreground: { z: 2, scale: 1.0 }
+    background: { z: -10, scale: 1},
+    midground: { z: 0, scale: 0.7 },
+    foreground: { z: 2, scale: 0.5 }
 };
 
 // Camera configuration

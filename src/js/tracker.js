@@ -6,8 +6,10 @@
 
 import { OneEuroFilter } from './utils.js';
 
-// Landmark indices
-const NOSE_TIP_INDEX = 1;
+// Landmark indices - Eye tracking
+const LEFT_EYE_CENTER = 468;  // Iris center (with refineLandmarks)
+const RIGHT_EYE_CENTER = 473; // Iris center (with refineLandmarks)
+const NOSE_TIP_INDEX = 1;     // Fallback
 
 // Face mesh connection groups for drawing
 const FACE_OVAL = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109, 10];
@@ -124,12 +126,28 @@ export class FaceTracker {
         if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
             const landmarks = results.multiFaceLandmarks[0];
             this.landmarks = landmarks;
-            const noseTip = landmarks[NOSE_TIP_INDEX];
+
+            // Use eye centers for tracking (more stable than nose)
+            let trackX, trackY;
+
+            if (landmarks.length > 473) {
+                // Use iris landmarks (available with refineLandmarks: true)
+                const leftEye = landmarks[LEFT_EYE_CENTER];
+                const rightEye = landmarks[RIGHT_EYE_CENTER];
+
+                // Calculate center point between both eyes
+                trackX = (leftEye.x + rightEye.x) / 2;
+                trackY = (leftEye.y + rightEye.y) / 2;
+            } else {
+                // Fallback to nose tip
+                const noseTip = landmarks[NOSE_TIP_INDEX];
+                trackX = noseTip.x;
+                trackY = noseTip.y;
+            }
 
             // Convert to normalized coordinates (-1 to 1)
-            // MediaPipe returns 0-1, we need to center and scale
-            const rawX = (noseTip.x - 0.5) * 2; // -1 to 1
-            const rawY = (noseTip.y - 0.5) * 2; // -1 to 1
+            const rawX = (trackX - 0.5) * 2;
+            const rawY = (trackY - 0.5) * 2;
 
             // Apply smoothing
             this.headX = this.filterX.filter(rawX);
