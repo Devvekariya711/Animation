@@ -151,7 +151,7 @@ export class ParallaxScene {
         const left = -right;
 
         // Shift frustum based on head position
-        const shiftX = headX * 0.5;
+        const shiftX = headX * 0.01;
         const shiftY = headY * 0.25;
 
         this.camera.projectionMatrix.makePerspective(
