@@ -8,8 +8,8 @@ import * as THREE from 'three';
 // Layer Z positions (from project spec)
 const LAYER_CONFIG = {
     background: { z: -10, scale: 3.0 },
-    midground: { z: 0, scale: 1.0 },
-    foreground: { z: 2, scale: 0.8 }
+    midground: { z: 0, scale: 1.5 },
+    foreground: { z: 2, scale: 1.0 }
 };
 
 // Camera configuration
@@ -24,6 +24,7 @@ export class ParallaxScene {
     constructor(container) {
         this.container = container;
         this.layers = {};
+        this.layerTextures = {};
         this.texturesLoaded = false;
 
         this.init();
@@ -53,10 +54,45 @@ export class ParallaxScene {
         );
         this.camera.position.set(0, 0, CAMERA_CONFIG.initialZ);
 
-        // Handle window resize
-        window.addEventListener('resize', () => this.onResize());
+        // Handle window resize with debounce
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => this.onResize(), 100);
+        });
 
         console.log('Scene initialized');
+    }
+
+    /**
+     * Calculate plane size to cover viewport at given Z position
+     */
+    calculatePlaneSize(zPosition, textureAspect) {
+        const distance = CAMERA_CONFIG.initialZ - zPosition;
+        const fovRad = THREE.MathUtils.degToRad(CAMERA_CONFIG.fov);
+
+        // Calculate visible height at this distance
+        const visibleHeight = 2 * Math.tan(fovRad / 2) * distance;
+        const screenAspect = window.innerWidth / window.innerHeight;
+        const visibleWidth = visibleHeight * screenAspect;
+
+        // Add extra margin to ensure full coverage during parallax movement
+        const coverageMultiplier = 1.5;
+
+        let width, height;
+
+        // Scale to cover the viewport while maintaining aspect ratio
+        if (textureAspect > screenAspect) {
+            // Texture is wider - fit to height
+            height = visibleHeight * coverageMultiplier;
+            width = height * textureAspect;
+        } else {
+            // Texture is taller - fit to width
+            width = visibleWidth * coverageMultiplier;
+            height = width / textureAspect;
+        }
+
+        return { width, height };
     }
 
     /**
@@ -86,6 +122,9 @@ export class ParallaxScene {
                 loadTexture(fgPath)
             ]);
 
+            // Store textures for resize
+            this.layerTextures = { background: bgTex, midground: midTex, foreground: fgTex };
+
             this.createLayerPlane('background', bgTex);
             this.createLayerPlane('midground', midTex);
             this.createLayerPlane('foreground', fgTex);
@@ -106,11 +145,16 @@ export class ParallaxScene {
         const config = LAYER_CONFIG[layerName];
 
         // Calculate aspect ratio from texture
-        const aspect = texture.image.width / texture.image.height;
-        const height = 5 * config.scale;
-        const width = height * aspect;
+        const textureAspect = texture.image.width / texture.image.height;
 
-        const geometry = new THREE.PlaneGeometry(width, height);
+        // Calculate size to cover viewport
+        const { width, height } = this.calculatePlaneSize(config.z, textureAspect);
+
+        // Apply layer-specific scale
+        const finalWidth = width * config.scale;
+        const finalHeight = height * config.scale;
+
+        const geometry = new THREE.PlaneGeometry(finalWidth, finalHeight);
         const material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true,
@@ -119,6 +163,10 @@ export class ParallaxScene {
 
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.z = config.z;
+
+        // Store texture aspect for resize
+        mesh.userData.textureAspect = textureAspect;
+        mesh.userData.layerName = layerName;
 
         this.scene.add(mesh);
         this.layers[layerName] = mesh;
@@ -169,10 +217,37 @@ export class ParallaxScene {
     }
 
     onResize() {
-        const aspect = window.innerWidth / window.innerHeight;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const aspect = width / height;
+
+        // Update camera
         this.camera.aspect = aspect;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Update renderer
+        this.renderer.setSize(width, height);
+
+        // Update layer planes to cover new viewport
+        Object.entries(this.layers).forEach(([layerName, mesh]) => {
+            const config = LAYER_CONFIG[layerName];
+            const textureAspect = mesh.userData.textureAspect;
+
+            if (textureAspect) {
+                const { width: planeWidth, height: planeHeight } = this.calculatePlaneSize(config.z, textureAspect);
+
+                // Dispose old geometry
+                mesh.geometry.dispose();
+
+                // Create new geometry with updated size
+                mesh.geometry = new THREE.PlaneGeometry(
+                    planeWidth * config.scale,
+                    planeHeight * config.scale
+                );
+            }
+        });
+
+        console.log(`Resized to ${width}x${height}`);
     }
 
     dispose() {
